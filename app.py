@@ -64,7 +64,19 @@ df = load_data()
 with st.sidebar:
     st.markdown("## Filters")
     all_states = sorted(df["State"].unique())
-    selected_states = st.multiselect("States", all_states, default=all_states)
+
+    btn_col1, btn_col2 = st.columns(2)
+    if btn_col1.button("Select All", use_container_width=True):
+        st.session_state["selected_states"] = all_states
+    if btn_col2.button("Clear All", use_container_width=True):
+        st.session_state["selected_states"] = []
+
+    selected_states = st.multiselect(
+        "States",
+        all_states,
+        default=st.session_state.get("selected_states", all_states),
+        key="selected_states",
+    )
     col_range = st.slider(
         "Cost of Living Index",
         int(df["Cost_of_Living_Index"].min()),
