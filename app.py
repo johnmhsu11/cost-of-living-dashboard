@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -47,8 +46,6 @@ TEMPLATE = dict(
         margin=dict(t=40, b=40, l=40, r=40),
     )
 )
-ACCENT = "#6366f1"
-SEQ_COLORS = px.colors.sequential.Purples
 
 # ── Data ───────────────────────────────────────────────────────────────────────
 @st.cache_data
@@ -90,7 +87,7 @@ filtered = df[
 st.markdown("# 🏙️ US Cost of Living Dashboard")
 st.markdown(
     "<p style='color:#9ca3af;margin-top:-0.5rem;margin-bottom:1.5rem'>"
-    "Comparing rent, groceries, dining, and purchasing power across 35 major US cities.</p>",
+    "Comparing rent, groceries, dining, and purchasing power across 142 major US cities.</p>",
     unsafe_allow_html=True,
 )
 
@@ -141,97 +138,35 @@ fig_map.update_layout(
 )
 st.plotly_chart(fig_map, use_container_width=True)
 
-# ── Rent + Scatter ─────────────────────────────────────────────────────────────
-col_left, col_right = st.columns(2)
-
-with col_left:
-    st.markdown("### Monthly Rent by City")
-    rent_df = filtered.sort_values("Rent_1BR_City_Center", ascending=True)
-    fig_rent = go.Figure()
-    fig_rent.add_trace(go.Bar(
-        y=rent_df["City"],
-        x=rent_df["Rent_1BR_City_Center"],
-        name="City Center",
-        orientation="h",
-        marker_color=ACCENT,
-    ))
-    fig_rent.add_trace(go.Bar(
-        y=rent_df["City"],
-        x=rent_df["Rent_1BR_Outside_Center"],
-        name="Outside Center",
-        orientation="h",
-        marker_color="#818cf8",
-    ))
-    fig_rent.update_layout(
-        **TEMPLATE["layout"],
-        barmode="group",
-        height=520,
-        legend=dict(orientation="h", y=1.05, x=0),
-        xaxis_title="Monthly Rent (USD)",
-        yaxis_title=None,
-        xaxis_tickprefix="$",
-    )
-    st.plotly_chart(fig_rent, use_container_width=True)
-
-with col_right:
-    st.markdown("### Salary vs. Cost of Living")
-    fig_scatter = px.scatter(
-        filtered,
-        x="Cost_of_Living_Index",
-        y="Avg_Monthly_Net_Salary",
-        size="Purchasing_Power",
-        color="Purchasing_Power",
-        hover_name="City_State",
-        hover_data={
-            "Cost_of_Living_Index": True,
-            "Avg_Monthly_Net_Salary": ":$,.0f",
-            "Purchasing_Power": ":.2f",
-        },
-        color_continuous_scale=["#312e81", "#6366f1", "#a5b4fc"],
-        labels={
-            "Cost_of_Living_Index": "Cost of Living Index",
-            "Avg_Monthly_Net_Salary": "Avg Monthly Salary (USD)",
-            "Purchasing_Power": "Purchasing Power",
-        },
-        size_max=25,
-    )
-    fig_scatter.update_layout(
-        **TEMPLATE["layout"],
-        height=520,
-        coloraxis_colorbar=dict(title="Purch. Power", tickfont=dict(color="#9ca3af")),
-        yaxis_tickprefix="$",
-    )
-    st.plotly_chart(fig_scatter, use_container_width=True)
-
-# ── Purchasing Power ranking ───────────────────────────────────────────────────
-st.markdown("### Purchasing Power Ranking")
-st.markdown(
-    "<p style='color:#9ca3af;font-size:0.85rem;margin-top:-0.75rem'>"
-    "Salary ÷ (Rent + Groceries + Dining) — higher is better.</p>",
-    unsafe_allow_html=True,
-)
-
-pp_df = filtered.sort_values("Purchasing_Power", ascending=True)
-fig_pp = px.bar(
-    pp_df,
-    x="Purchasing_Power",
-    y="City",
-    orientation="h",
+# ── Scatter ────────────────────────────────────────────────────────────────────
+st.markdown("### Salary vs. Cost of Living")
+fig_scatter = px.scatter(
+    filtered,
+    x="Cost_of_Living_Index",
+    y="Avg_Monthly_Net_Salary",
+    size="Purchasing_Power",
     color="Purchasing_Power",
-    color_continuous_scale=["#312e81", "#6366f1", "#a5b4fc"],
     hover_name="City_State",
-    hover_data={"Purchasing_Power": ":.2f", "City": False},
-    labels={"Purchasing_Power": "Purchasing Power Score"},
+    hover_data={
+        "Cost_of_Living_Index": True,
+        "Avg_Monthly_Net_Salary": ":$,.0f",
+        "Purchasing_Power": ":.2f",
+    },
+    color_continuous_scale=["#312e81", "#6366f1", "#a5b4fc"],
+    labels={
+        "Cost_of_Living_Index": "Cost of Living Index",
+        "Avg_Monthly_Net_Salary": "Avg Monthly Salary (USD)",
+        "Purchasing_Power": "Purchasing Power",
+    },
+    size_max=25,
 )
-fig_pp.update_layout(
+fig_scatter.update_layout(
     **TEMPLATE["layout"],
-    height=560,
-    showlegend=False,
-    coloraxis_showscale=False,
-    xaxis_title="Purchasing Power Score",
-    yaxis_title=None,
+    height=500,
+    coloraxis_colorbar=dict(title="Purch. Power", tickfont=dict(color="#9ca3af")),
+    yaxis_tickprefix="$",
 )
-st.plotly_chart(fig_pp, use_container_width=True)
+st.plotly_chart(fig_scatter, use_container_width=True)
 
 # ── Data table ─────────────────────────────────────────────────────────────────
 st.markdown("### Full Data Table")
