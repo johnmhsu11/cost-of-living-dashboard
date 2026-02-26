@@ -12,14 +12,9 @@ st.set_page_config(
 # ── Theme / CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* Dark background matching portfolio */
     .stApp { background-color: #111827; }
-    section[data-testid="stSidebar"] { background-color: #1f2937; }
     .block-container { padding-top: 2rem; padding-bottom: 2rem; }
-
     h1, h2, h3, p, label { color: #f9fafb !important; }
-
-    /* Metric cards */
     [data-testid="metric-container"] {
         background: #1f2937;
         border: 1px solid #374151;
@@ -28,9 +23,25 @@ st.markdown("""
     }
     [data-testid="metric-container"] label { color: #9ca3af !important; font-size: 0.8rem; }
     [data-testid="metric-container"] [data-testid="stMetricValue"] { color: #f9fafb !important; }
-
-    /* Multiselect */
     .stMultiSelect [data-baseweb="tag"] { background-color: #6366f1; }
+    /* Expander dark theme */
+    [data-testid="stExpander"] details {
+        background-color: #1f2937;
+        border: 1px solid #374151 !important;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    [data-testid="stExpander"] summary { color: #f9fafb !important; }
+    [data-testid="stExpander"] summary:hover { background-color: #374151 !important; border-radius: 8px; }
+    /* Mobile adjustments */
+    @media (max-width: 640px) {
+        .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; padding-top: 1rem !important; }
+        h1 { font-size: 1.4rem !important; }
+        [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; gap: 0.5rem !important; }
+        [data-testid="stHorizontalBlock"] > [data-testid="column"] { flex: 1 1 calc(50% - 0.5rem) !important; min-width: calc(50% - 0.5rem) !important; }
+        [data-testid="metric-container"] [data-testid="stMetricValue"] { font-size: 0.8rem !important; word-break: break-word !important; }
+        [data-testid="metric-container"] { padding: 0.75rem 1rem !important; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -60,9 +71,16 @@ def load_data():
 
 df = load_data()
 
-# ── Sidebar filters ────────────────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown("## Filters")
+# ── Header ─────────────────────────────────────────────────────────────────────
+st.markdown("# 🏙️ US Cost of Living Dashboard")
+st.markdown(
+    "<p style='color:#9ca3af;margin-top:-0.5rem;margin-bottom:1rem'>"
+    "Comparing rent, groceries, dining, and purchasing power across 142 major US cities.</p>",
+    unsafe_allow_html=True,
+)
+
+# ── Filters ─────────────────────────────────────────────────────────────────────
+with st.expander("⚙️ Filters", expanded=False):
     all_states = sorted(df["State"].unique())
 
     btn_col1, btn_col2 = st.columns(2)
@@ -83,7 +101,6 @@ with st.sidebar:
         int(df["Cost_of_Living_Index"].max()),
         (int(df["Cost_of_Living_Index"].min()), int(df["Cost_of_Living_Index"].max())),
     )
-    st.markdown("---")
     st.markdown(
         "<small style='color:#9ca3af'>Data sourced from Numbeo public data. "
         "All figures approximate.</small>",
@@ -94,14 +111,6 @@ filtered = df[
     df["State"].isin(selected_states) &
     df["Cost_of_Living_Index"].between(*col_range)
 ]
-
-# ── Header ─────────────────────────────────────────────────────────────────────
-st.markdown("# 🏙️ US Cost of Living Dashboard")
-st.markdown(
-    "<p style='color:#9ca3af;margin-top:-0.5rem;margin-bottom:1.5rem'>"
-    "Comparing rent, groceries, dining, and purchasing power across 142 major US cities.</p>",
-    unsafe_allow_html=True,
-)
 
 # ── KPI metrics ────────────────────────────────────────────────────────────────
 m1, m2, m3, m4 = st.columns(4)
