@@ -263,3 +263,20 @@ st.dataframe(
     use_container_width=True,
     hide_index=True,
 )
+
+# ── Data sources ───────────────────────────────────────────────────────────────
+st.markdown("---")
+st.markdown("### Data Sources")
+st.markdown("""
+| Source | Data Used | Link |
+|---|---|---|
+| **Numbeo** | Cost of living indices, rent prices, groceries & dining estimates, average net salary | [numbeo.com/cost-of-living](https://www.numbeo.com/cost-of-living/) |
+| **US Census Bureau** | City geographic coordinates (latitude/longitude) | [census.gov](https://www.census.gov/geographies/reference-files.html) |
+
+**Notes:**
+- All cost figures are in **USD** and represent approximate monthly estimates for a single person.
+- The **Cost of Living Index** is relative to New York City (NYC = 100). A score of 50 means roughly half the cost of living in NYC.
+- The **Purchasing Power Score** is calculated as: *Average Monthly Net Salary ÷ (Rent + Groceries + Dining)*. A score above 1.5 indicates strong purchasing power; below 1.0 means typical expenses exceed take-home pay.
+- Salary figures represent average **after-tax** monthly net income and vary by occupation and individual circumstances.
+- Data reflects conditions as of **2024–2025**. Figures may not capture the most recent market changes.
+""")
